@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: foo
-        uses: Flutter-libraries/mayo_action_release@v0.0.3.staging.2
+        uses: Flutter-libraries/mayo_action_release@v0.0.3.staging.4
         with:
           repository: ${{ github.repository }}
           tag: ${{ github.ref }}
