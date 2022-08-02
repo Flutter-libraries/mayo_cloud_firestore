@@ -1,0 +1,24 @@
+on: 
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*.staging.*'
+
+jobs:
+  create-prerelease:
+    runs-on: ubuntu-latest
+    name: A job create pre-release and notify by slack
+    steps:
+      - uses: actions/checkout@v3
+      - id: foo
+        uses: actions/mayo_action_release@v0.0.3.staging.2
+        with:
+          repository: ${{ github.repository }}
+          tag: ${{ github.ref }}
+          environment: staging
+          pre-release: true
+          personal_token: ${{ secrets.PERSONAL_TOKEN }}
+          display_name: Mayo Cloud Firestore
+          slack_icon: https://mayosoftware.es/wp-content/uploads/2022/08/M.png
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+      - run: echo Changelog url ${{ steps.foo.outputs.changelog_url }}
