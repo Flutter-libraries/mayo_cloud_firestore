@@ -84,13 +84,19 @@ class FirestoreFailure implements Exception {
   /// Exception when a not found a document in firestore
   factory FirestoreFailure.documentNotFound(String path) {
     return FirestoreFailure(
-        'document-not-found', 'Document not found at $path', path);
+      'document-not-found',
+      'Document not found at $path',
+      path,
+    );
   }
 
   /// Exception when a query returns no results
   factory FirestoreFailure.queryWithoutResults(String path) {
     return FirestoreFailure(
-        'query-without-results', 'Where clause without results at $path', path);
+      'query-without-results',
+      'Where clause without results at $path',
+      path,
+    );
   }
 
   /// Create a firebase storage message
@@ -225,8 +231,9 @@ class FirestoreDataProvider {
       {...data ?? {}, 'id': id};
 
   Query<Map<String, dynamic>> _applyFilters(
-      CollectionReference<Map<String, dynamic>> reference,
-      List<WhereItem> whereItems) {
+    CollectionReference<Map<String, dynamic>> reference,
+    List<WhereItem> whereItems,
+  ) {
     Query<Map<String, dynamic>> query = reference;
     // Add where clauses
     for (final item in whereItems) {
@@ -270,7 +277,9 @@ class FirestoreDataProvider {
   }
 
   Query<Map<String, dynamic>> _applyOrderBy(
-      Query<Map<String, dynamic>> reference, List<OrderByItem> orderByItems) {
+    Query<Map<String, dynamic>> reference,
+    List<OrderByItem> orderByItems,
+  ) {
     var query = reference;
     // Add order by clauses
     for (final item in orderByItems) {
@@ -281,8 +290,7 @@ class FirestoreDataProvider {
 
   /// Get a document from the database in the path [path]/[uid].
   ///
-  /// Throws a [DocumentNotFound] if the document does not exist. Throws a
-  /// [FirestoreFailure] if an error occurs.
+  /// Throws a [FirestoreFailure] if an error occurs.
   Future<T> getById<T>(
     String path,
     String uid,
@@ -433,7 +441,7 @@ class FirestoreDataProvider {
     final reference = instance.collection(path);
 
     try {
-      // TODO: Make this with Extension
+      // TODO(miguel-mayo): Make this with Extension
       var query = _applyFilters(reference, whereItems);
       query = _applyOrderBy(query, orderByItems);
       final results = await query
@@ -535,7 +543,7 @@ class FirestoreDataProvider {
     }
   }
 
-  /// Add a document in [path] with the values on [data].
+  /// Delete a document in [path]/[uid]
   ///
   /// [FirestoreFailure] if an error occurs.
   Future<void> delete<T>(
