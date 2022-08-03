@@ -69,31 +69,6 @@ class OrderByItem {
   final bool descending;
 }
 
-/// Exception when a document not found in firestore
-class DocumentNotFound implements Exception {
-  /// Returns [path] of the not found document and warning [message]
-  DocumentNotFound(this.path) : message = 'Document not found at $path';
-
-  /// Path of the document
-  final String path;
-
-  /// Information message
-  final String message;
-}
-
-/// Exception when a document not found in firestore
-class QueryWithoutResults implements Exception {
-  /// Returns [path] of the not found document and warning [message]
-  QueryWithoutResults(this.path)
-      : message = 'Where clause without results at $path';
-
-  /// Path of the document
-  final String path;
-
-  /// Information message
-  final String message;
-}
-
 /// {@template storage_failure}
 /// Thrown if during the firestore operations a failure occurs.
 /// {@endtemplate}
@@ -105,6 +80,18 @@ class FirestoreFailure implements Exception {
     this.path,
     this.stackTrace,
   ]);
+
+  /// Exception when a not found a document in firestore
+  factory FirestoreFailure.documentNotFound(String path) {
+    return FirestoreFailure(
+        'document-not-found', 'Document not found at $path', path);
+  }
+
+  /// Exception when a query returns no results
+  factory FirestoreFailure.queryWithoutResults(String path) {
+    return FirestoreFailure(
+        'query-without-results', 'Where clause without results at $path', path);
+  }
 
   /// Create a firebase storage message
   /// from a firebase storage exception code.
@@ -307,11 +294,11 @@ class FirestoreDataProvider {
 
       // If doc doesn't exist, return DocumentNotFound
       if (!doc.exists) {
-        throw DocumentNotFound(reference.path);
+        throw FirestoreFailure.documentNotFound(reference.path);
       }
 
       return ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson);
-    } on DocumentNotFound {
+    } on FirestoreFailure {
       rethrow;
     } on FirebaseException catch (err) {
       throw FirestoreFailure.fromCode(
@@ -370,7 +357,7 @@ class FirestoreDataProvider {
       final results = await query.get();
 
       if (results.docs.isEmpty) {
-        throw QueryWithoutResults(path);
+        throw FirestoreFailure.queryWithoutResults(path);
       }
 
       return results.docs
@@ -379,7 +366,7 @@ class FirestoreDataProvider {
                 ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
-    } on QueryWithoutResults {
+    } on FirestoreFailure {
       rethrow;
     } on FirebaseException catch (err) {
       throw FirestoreFailure.fromCode(
@@ -411,7 +398,7 @@ class FirestoreDataProvider {
           .get();
 
       if (results.docs.isEmpty) {
-        throw QueryWithoutResults(path);
+        throw FirestoreFailure.queryWithoutResults(path);
       }
 
       return results.docs
@@ -420,7 +407,7 @@ class FirestoreDataProvider {
                 ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
-    } on QueryWithoutResults {
+    } on FirestoreFailure {
       rethrow;
     } on FirebaseException catch (err) {
       throw FirestoreFailure.fromCode(
@@ -456,7 +443,7 @@ class FirestoreDataProvider {
           .get();
 
       if (results.docs.isEmpty) {
-        throw QueryWithoutResults(path);
+        throw FirestoreFailure.queryWithoutResults(path);
       }
 
       return results.docs
@@ -465,7 +452,7 @@ class FirestoreDataProvider {
                 ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
-    } on QueryWithoutResults {
+    } on FirestoreFailure {
       rethrow;
     } on FirebaseException catch (err) {
       throw FirestoreFailure.fromCode(
