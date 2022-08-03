@@ -42,7 +42,7 @@ void main() {
       expect(
           () async => dataProvider.getById('users', user.id, User.fromJson),
           throwsA(
-            isA<DocumentNotFound>(),
+            isA<FirestoreFailure>(),
           ));
     });
   });
