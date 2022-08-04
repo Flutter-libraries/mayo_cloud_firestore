@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mayo_cloud_firestore/mayo_cloud_firestore.dart';
 import 'package:mayo_cloud_firestore/src/api_result.dart';
 
 /// Firebase error codes related with firestore .

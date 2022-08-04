@@ -16,7 +16,7 @@ void main() {
   late FirebaseFirestore firestore;
   late FirestoreDataProvider dataProvider;
 
-  group('$FirebaseFirestore', () {
+  group('FirebaseFirestore', () {
     setUpAll(() async {
       firestore = FakeFirebaseFirestore();
       dataProvider = FirestoreDataProvider(firestore);
