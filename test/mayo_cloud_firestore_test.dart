@@ -40,10 +40,11 @@ void main() {
     });
     test('getById not found exception', () async {
       expect(
-          () async => dataProvider.getById('users', user.id, User.fromJson),
-          throwsA(
-            isA<FirestoreFailure>(),
-          ));
+        () async => dataProvider.getById('users', user.id, User.fromJson),
+        throwsA(
+          isA<FirestoreFailure>(),
+        ),
+      );
     });
   });
 }
