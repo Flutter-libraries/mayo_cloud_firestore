@@ -1,7 +1,66 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mayo_cloud_firestore/mayo_cloud_firestore.dart';
 import 'package:mayo_cloud_firestore/src/api_result.dart';
+
+/// Firebase error codes related with firestore .
+enum FirestoreFailureCodes {
+  /// firestoreUnknown code from firebase
+  firestoreUnknown('firestore/unknown'),
+
+  /// failedPrecondition code from firebase
+  failedPrecondition('failed-precondition'),
+
+  /// dataStale code from firebase
+  dataStale('data-stale'),
+
+  /// failure code from firebase
+  failure('failure'),
+
+  /// permissionDenied code from firebase
+  permissionDenied('permission-denied'),
+
+  /// disconnected code from firebase
+  disconnected('disconnected'),
+
+  /// expiredToken code from firebase
+  expiredToken('expired-token'),
+
+  /// invalidToken code from firebase
+  invalidToken('invalid-token'),
+
+  /// maxRetries code from firebase
+  maxRetries('max-retries'),
+
+  /// overriddenBySet code from firebase
+  overriddenBySet('overridden-by-set'),
+
+  /// unavailable code from firebase
+  unavailable('unavailable'),
+
+  /// networkError code from firebase
+  networkError('network-error'),
+
+  /// writeCancelled code from firebase
+  writeCancelled('write-cancelled'),
+
+  /// invalidType code from firebase
+  invalidType('invalid-type'),
+
+  // Custom codes
+  /// documentNotFound code from firebase
+  documentNotFound('document-not-found'),
+
+  /// queryWithoutResults code from firebase
+  queryWithoutResults('query-without-results');
+
+  /// Cosntructor
+  const FirestoreFailureCodes(this.code);
+
+  /// Code param
+  final String code;
+}
 
 /// Possible operators for where
 enum WhereOperator {
@@ -84,7 +143,7 @@ class FirestoreFailure implements Exception {
   /// Exception when a not found a document in firestore
   factory FirestoreFailure.documentNotFound(String path) {
     return FirestoreFailure(
-      'document-not-found',
+      FirestoreFailureCodes.documentNotFound.code,
       'Document not found at $path',
       path,
     );
@@ -93,7 +152,7 @@ class FirestoreFailure implements Exception {
   /// Exception when a query returns no results
   factory FirestoreFailure.queryWithoutResults(String path) {
     return FirestoreFailure(
-      'query-without-results',
+      FirestoreFailureCodes.queryWithoutResults.code,
       'Where clause without results at $path',
       path,
     );
@@ -107,102 +166,101 @@ class FirestoreFailure implements Exception {
     String? path,
     String? stackTrace,
   }) {
-    switch (code) {
-      case 'firestore/unknown':
-        return FirestoreFailure(
-          code,
-          'An unknown error occurred.',
-          path,
-          stackTrace,
-        );
-      case 'failed-precondition':
-        return FirestoreFailure(code, stackTrace!, path, stackTrace);
-      case 'data-stale':
-        return FirestoreFailure(
-          code,
-          'The transaction needs to be run again with current data.',
-          path,
-          stackTrace,
-        );
-      case 'failure':
-        return FirestoreFailure(
-          code,
-          'The server indicated that this operation failed.',
-          path,
-          stackTrace,
-        );
-      case 'permission-denied':
-        return FirestoreFailure(
-          code,
-          "Client doesn't have permission to access the desired data.",
-          path,
-          stackTrace,
-        );
-      case 'disconnected':
-        return FirestoreFailure(
-          code,
-          'The operation had to be aborted due to a network disconnect.',
-          path,
-          stackTrace,
-        );
-      case 'expired-token':
-        return FirestoreFailure(
-          code,
-          'The supplied auth token has expired.',
-          path,
-          stackTrace,
-        );
-      case 'invalid-token':
-        return FirestoreFailure(
-          code,
-          'The supplied auth token was invalid.',
-          path,
-          stackTrace,
-        );
-      case 'max-retries':
-        return FirestoreFailure(
-          code,
-          'The transaction had too many retries.',
-          path,
-          stackTrace,
-        );
-      case 'overridden-by-set':
-        return FirestoreFailure(
-          code,
-          'The transaction was overridden by a subsequent set.',
-          path,
-          stackTrace,
-        );
-      case 'unavailable':
-        return FirestoreFailure(
-          code,
-          'The service is unavailable.',
-          path,
-          stackTrace,
-        );
-      case 'network-error':
-        return FirestoreFailure(
-          code,
-          'The operation could not be performed due to a network error.',
-          path,
-          stackTrace,
-        );
-      case 'write-cancelled':
-        return FirestoreFailure(
-          code,
-          'The write was canceled by the user.',
-          path,
-          stackTrace,
-        );
-      case 'invalid-type':
-        return FirestoreFailure(
-          code,
-          'Wrong model type. Must implement equatable',
-          path,
-          stackTrace,
-        );
-      default:
-        return const FirestoreFailure();
+    if (code == FirestoreFailureCodes.firestoreUnknown.code) {
+      return FirestoreFailure(
+        code,
+        'An unknown error occurred.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.failedPrecondition.code) {
+      return FirestoreFailure(code, stackTrace!, path, stackTrace);
+    } else if (code == FirestoreFailureCodes.dataStale.code) {
+      return FirestoreFailure(
+        code,
+        'The transaction needs to be run again with current data.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.failure.code) {
+      return FirestoreFailure(
+        code,
+        'The server indicated that this operation failed.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.permissionDenied.code) {
+      return FirestoreFailure(
+        code,
+        "Client doesn't have permission to access the desired data.",
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.disconnected.code) {
+      return FirestoreFailure(
+        code,
+        'The operation had to be aborted due to a network disconnect.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.expiredToken.code) {
+      return FirestoreFailure(
+        code,
+        'The supplied auth token has expired.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.invalidToken.code) {
+      return FirestoreFailure(
+        code,
+        'The supplied auth token was invalid.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.maxRetries.code) {
+      return FirestoreFailure(
+        code,
+        'The transaction had too many retries.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.overriddenBySet.code) {
+      return FirestoreFailure(
+        code,
+        'The transaction was overridden by a subsequent set.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.unavailable.code) {
+      return FirestoreFailure(
+        code,
+        'The service is unavailable.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.networkError.code) {
+      return FirestoreFailure(
+        code,
+        'The operation could not be performed due to a network error.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.writeCancelled.code) {
+      return FirestoreFailure(
+        code,
+        'The write was canceled by the user.',
+        path,
+        stackTrace,
+      );
+    } else if (code == FirestoreFailureCodes.invalidType.code) {
+      return FirestoreFailure(
+        code,
+        'Wrong model type. Must implement equatable',
+        path,
+        stackTrace,
+      );
+    } else {
+      return const FirestoreFailure();
     }
   }
 
