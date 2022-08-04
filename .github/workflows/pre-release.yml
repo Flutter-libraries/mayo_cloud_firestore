@@ -1,3 +1,4 @@
+name: Create pre-release and notify by slack
 on: 
   workflow_dispatch:
     # Enable manual run
