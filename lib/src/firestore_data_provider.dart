@@ -456,11 +456,7 @@ class FirestoreDataProvider {
 
     try {
       final query = _applyOrderBy(reference, orderByItems);
-      final results = await query
-          .orderBy(
-            'field',
-          )
-          .get();
+      final results = await query.get();
 
       if (results.docs.isEmpty) {
         throw FirestoreFailure.queryWithoutResults(path);
