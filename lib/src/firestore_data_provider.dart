@@ -497,11 +497,7 @@ class FirestoreDataProvider {
       // TODO(miguel-mayo): Make this with Extension
       var query = _applyFilters(reference, whereItems);
       query = _applyOrderBy(query, orderByItems);
-      final results = await query
-          .orderBy(
-            'field',
-          )
-          .get();
+      final results = await query.get();
 
       if (results.docs.isEmpty) {
         throw FirestoreFailure.queryWithoutResults(path);
