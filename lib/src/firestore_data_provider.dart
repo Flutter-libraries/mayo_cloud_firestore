@@ -285,7 +285,7 @@ class FirestoreDataProvider {
   final FirebaseFirestore instance;
 
   Map<String, dynamic> _toMap(Map<String, dynamic>? data, String id) =>
-      {...data ?? {}, 'id': id};
+      {...data ?? {}, 'id': id, 'uid': id};
 
   Query<Map<String, dynamic>> _applyFilters(
     CollectionReference<Map<String, dynamic>> reference,
