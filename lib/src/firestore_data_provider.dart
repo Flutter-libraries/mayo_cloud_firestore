@@ -49,10 +49,7 @@ enum FirestoreFailureCodes {
 
   // Custom codes
   /// documentNotFound code from firebase
-  documentNotFound('document-not-found'),
-
-  /// queryWithoutResults code from firebase
-  queryWithoutResults('query-without-results');
+  documentNotFound('document-not-found');
 
   /// Cosntructor
   const FirestoreFailureCodes(this.code);
@@ -144,15 +141,6 @@ class FirestoreFailure implements Exception {
     return FirestoreFailure(
       FirestoreFailureCodes.documentNotFound.code,
       'Document not found at $path',
-      path,
-    );
-  }
-
-  /// Exception when a query returns no results
-  factory FirestoreFailure.queryWithoutResults(String path) {
-    return FirestoreFailure(
-      FirestoreFailureCodes.queryWithoutResults.code,
-      'Where clause without results at $path',
       path,
     );
   }
@@ -422,7 +410,7 @@ class FirestoreDataProvider {
       final results = await query.get();
 
       if (results.docs.isEmpty) {
-        throw FirestoreFailure.queryWithoutResults(path);
+        return <T>[];
       }
 
       return results.docs
@@ -496,7 +484,7 @@ class FirestoreDataProvider {
       final results = await query.get();
 
       if (results.docs.isEmpty) {
-        throw FirestoreFailure.queryWithoutResults(path);
+        return <T>[];
       }
 
       return results.docs
@@ -537,7 +525,7 @@ class FirestoreDataProvider {
       final results = await query.get();
 
       if (results.docs.isEmpty) {
-        throw FirestoreFailure.queryWithoutResults(path);
+        return <T>[];
       }
 
       return results.docs
