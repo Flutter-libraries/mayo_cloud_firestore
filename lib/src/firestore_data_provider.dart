@@ -395,6 +395,46 @@ class FirestoreDataProvider {
     }
   }
 
+  /// Snapshot documents on [path].
+  ///
+  /// [FirestoreFailure] if an error occurs.
+  Stream<List<T>> snapshots<T>(
+    String path,
+    T Function(Map<String, dynamic>) fromJson, {
+    List<OrderByItem>? orderByItems,
+  }) {
+    final reference = instance.collection(path);
+
+    final query = orderByItems != null
+        ? _applyOrderBy(reference, orderByItems)
+        : reference;
+
+    try {
+      return query.snapshots().map((query) {
+        if (query.docs.isEmpty) {
+          return [];
+        } else {
+          return query.docs
+              .map(
+                (doc) => ApiResult.fromResponse(
+                    _toMap(doc.data(), doc.id), fromJson),
+              )
+              .toList();
+        }
+      });
+    } on FirestoreFailure {
+      rethrow;
+    } on FirebaseException catch (err) {
+      throw FirestoreFailure.fromCode(
+        err.code,
+        path: reference.path,
+        stackTrace: err.stackTrace.toString(),
+      );
+    } catch (_) {
+      throw const FirestoreFailure();
+    }
+  }
+
   /// Filter documents from [path] using the clauses in [whereItems].
   ///
   /// [FirestoreFailure] if an error occurs.
