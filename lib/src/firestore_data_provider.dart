@@ -417,10 +417,42 @@ class FirestoreDataProvider {
           return query.docs
               .map(
                 (doc) => ApiResult.fromResponse(
-                    _toMap(doc.data(), doc.id), fromJson),
+                  _toMap(doc.data(), doc.id),
+                  fromJson,
+                ),
               )
               .toList();
         }
+      });
+    } on FirestoreFailure {
+      rethrow;
+    } on FirebaseException catch (err) {
+      throw FirestoreFailure.fromCode(
+        err.code,
+        path: reference.path,
+        stackTrace: err.stackTrace.toString(),
+      );
+    } catch (_) {
+      throw const FirestoreFailure();
+    }
+  }
+
+  /// Snapshot documents on [path].
+  ///
+  /// [FirestoreFailure] if an error occurs.
+  Stream<T> docSnapshots<T>(
+    String path,
+    String uid,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    final reference = instance.collection(path).doc(uid);
+
+    try {
+      return reference.snapshots().map((doc) {
+        return ApiResult.fromResponse(
+          _toMap(doc.data(), doc.id),
+          fromJson,
+        );
       });
     } on FirestoreFailure {
       rethrow;
@@ -491,7 +523,9 @@ class FirestoreDataProvider {
           return query.docs
               .map(
                 (doc) => ApiResult.fromResponse(
-                    _toMap(doc.data(), doc.id), fromJson),
+                  _toMap(doc.data(), doc.id),
+                  fromJson,
+                ),
               )
               .toList();
         }
