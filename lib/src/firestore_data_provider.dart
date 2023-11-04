@@ -731,4 +731,9 @@ class FirestoreDataProvider {
       throw const FirestoreFailure();
     }
   }
+
+  /// Get id
+  String getId(String path) {
+    return instance.collection(path).doc().id;
+  }
 }
