@@ -650,12 +650,13 @@ class FirestoreDataProvider {
   Future<void> set<T>(
     String path,
     String uid,
-    Map<String, dynamic> data,
-  ) async {
+    Map<String, dynamic> data, {
+    bool merge = false,
+  }) async {
     final reference = instance.collection(path).doc(uid);
 
     try {
-      return await reference.set(data);
+      return await reference.set(data, SetOptions(merge: merge));
     } on FirebaseException catch (err) {
       throw FirestoreFailure.fromCode(
         err.code,
