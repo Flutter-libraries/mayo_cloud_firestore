@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-///
+/// Convert timestamp --> date
 class TimestampMapConverter
     implements JsonConverter<DateTime?, Map<String, dynamic>?> {
   /// Constructor
@@ -15,10 +16,10 @@ class TimestampMapConverter
         timestamp['_nanoseconds'] is! int) {
       return null;
     }
-    return DateTime.fromMillisecondsSinceEpoch(
-      (timestamp['_seconds'] as int) * 1000 +
-          (timestamp['_nanoseconds'] as int) ~/ 1000,
-    );
+    return Timestamp(
+      timestamp['_seconds'] as int,
+      timestamp['_nanoseconds'] as int,
+    ).toDate();
   }
 
   @override
@@ -26,9 +27,12 @@ class TimestampMapConverter
     if (date == null) {
       return null;
     }
+
+    final ts = Timestamp.fromDate(date);
+
     return {
-      '_seconds': date.millisecondsSinceEpoch ~/ 1000,
-      '_nanoseconds': (date.millisecondsSinceEpoch % 1000) * 1000,
+      '_seconds': ts.seconds,
+      '_nanoseconds': ts.nanoseconds,
     };
   }
 }
