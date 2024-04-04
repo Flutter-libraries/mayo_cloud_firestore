@@ -13,7 +13,7 @@ class TimestampMapConverter
   }
 
   /// Constructor
-  TimestampMapConverter._({
+  const TimestampMapConverter._({
     this.secondsKey,
     this.nanosecondsKey,
   });
