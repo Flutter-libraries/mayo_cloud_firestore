@@ -5,20 +5,26 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 class TimestampMapConverter
     implements JsonConverter<DateTime?, Map<String, dynamic>?> {
   /// Constructor
-  const TimestampMapConverter();
+  const TimestampMapConverter({
+    this.secondsKey,
+    this.nanosecondsKey,
+  });
+
+  final String? secondsKey;
+  final String? nanosecondsKey;
 
   @override
   DateTime? fromJson(Map<String, dynamic>? timestamp) {
     if (timestamp == null ||
-        timestamp['_seconds'] == null ||
-        timestamp['_nanoseconds'] == null ||
-        timestamp['_seconds'] is! int ||
-        timestamp['_nanoseconds'] is! int) {
+        timestamp[secondsKey ?? '_seconds'] == null ||
+        timestamp[nanosecondsKey ?? '_nanoseconds'] == null ||
+        timestamp[secondsKey ?? '_seconds'] is! int ||
+        timestamp[nanosecondsKey ?? '_nanoseconds'] is! int) {
       return null;
     }
     return Timestamp(
-      timestamp['_seconds'] as int,
-      timestamp['_nanoseconds'] as int,
+      timestamp[secondsKey ?? '_seconds'] as int,
+      timestamp[nanosecondsKey ?? '_nanoseconds'] as int,
     ).toDate();
   }
 
@@ -31,8 +37,8 @@ class TimestampMapConverter
     final ts = Timestamp.fromDate(date);
 
     return {
-      '_seconds': ts.seconds,
-      '_nanoseconds': ts.nanoseconds,
+      secondsKey ?? '_seconds': ts.seconds,
+      nanosecondsKey ?? '_nanoseconds': ts.nanoseconds,
     };
   }
 }

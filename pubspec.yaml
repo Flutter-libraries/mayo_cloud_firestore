@@ -1,6 +1,6 @@
 name: mayo_cloud_firestore
 description: Packake that exposes simple APIs to perform CRUD operations on Firestore
-version: 1.0.21
+version: 1.0.22
 homepage: https://mayosoftware.es
 
 environment:
