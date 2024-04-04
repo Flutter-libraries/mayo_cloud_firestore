@@ -4,38 +4,33 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 /// Convert timestamp --> date
 class TimestampMapConverter
     implements JsonConverter<DateTime?, Map<String, dynamic>?> {
-  /// Factory constructor
-  factory TimestampMapConverter({String? secondsKey, String? nanosecondsKey}) {
-    return TimestampMapConverter._(
-      secondsKey: secondsKey,
-      nanosecondsKey: nanosecondsKey,
-    );
-  }
+  ///  constructor
+  const TimestampMapConverter()
+      : secondsKey = '_seconds',
+        nanosecondsKey = '_nanoseconds';
 
-  /// Constructor
-  const TimestampMapConverter._({
-    this.secondsKey,
-    this.nanosecondsKey,
-  });
+  const TimestampMapConverter.noUnderscored()
+      : secondsKey = 'seconds',
+        nanosecondsKey = 'nanos';
 
   /// Key for seconds
-  final String? secondsKey;
+  final String secondsKey;
 
   /// Key for nanoseconds
-  final String? nanosecondsKey;
+  final String nanosecondsKey;
 
   @override
   DateTime? fromJson(Map<String, dynamic>? timestamp) {
     if (timestamp == null ||
-        timestamp[secondsKey ?? '_seconds'] == null ||
-        timestamp[nanosecondsKey ?? '_nanoseconds'] == null ||
-        timestamp[secondsKey ?? '_seconds'] is! int ||
-        timestamp[nanosecondsKey ?? '_nanoseconds'] is! int) {
+        timestamp[secondsKey] == null ||
+        timestamp[nanosecondsKey] == null ||
+        timestamp[secondsKey] is! int ||
+        timestamp[nanosecondsKey] is! int) {
       return null;
     }
     return Timestamp(
-      timestamp[secondsKey ?? '_seconds'] as int,
-      timestamp[nanosecondsKey ?? '_nanoseconds'] as int,
+      timestamp[secondsKey] as int,
+      timestamp[nanosecondsKey] as int,
     ).toDate();
   }
 
@@ -48,8 +43,8 @@ class TimestampMapConverter
     final ts = Timestamp.fromDate(date);
 
     return {
-      secondsKey ?? '_seconds': ts.seconds,
-      nanosecondsKey ?? '_nanoseconds': ts.nanoseconds,
+      secondsKey: ts.seconds,
+      nanosecondsKey: ts.nanoseconds,
     };
   }
 }
