@@ -4,13 +4,24 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 /// Convert timestamp --> date
 class TimestampMapConverter
     implements JsonConverter<DateTime?, Map<String, dynamic>?> {
+  /// Factory constructor
+  factory TimestampMapConverter({String? secondsKey, String? nanosecondsKey}) {
+    return TimestampMapConverter._(
+      secondsKey: secondsKey,
+      nanosecondsKey: nanosecondsKey,
+    );
+  }
+
   /// Constructor
-  const TimestampMapConverter({
+  TimestampMapConverter._({
     this.secondsKey,
     this.nanosecondsKey,
   });
 
+  /// Key for seconds
   final String? secondsKey;
+
+  /// Key for nanoseconds
   final String? nanosecondsKey;
 
   @override
