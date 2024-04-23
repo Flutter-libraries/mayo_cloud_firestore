@@ -272,8 +272,7 @@ class FirestoreDataProvider {
   /// Firestore instance
   final FirebaseFirestore instance;
 
-  Map<String, dynamic> _toMap(Map<String, dynamic>? data, String id) =>
-      {...data ?? {}, 'id': id, 'uid': id};
+
 
   Query<Map<String, dynamic>> _applyFilters(
     CollectionReference<Map<String, dynamic>> reference,
@@ -350,7 +349,7 @@ class FirestoreDataProvider {
         throw FirestoreFailure.documentNotFound(reference.path);
       }
 
-      return ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson);
+      return ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson);
     } on FirestoreFailure {
       rethrow;
     } on FirebaseException catch (err) {
@@ -378,7 +377,7 @@ class FirestoreDataProvider {
             (query) => query.docs
                 .map(
                   (doc) => ApiResult.fromResponse(
-                    _toMap(doc.data(), doc.id),
+                    ApiResult.toMap(doc.data(), doc.id),
                     fromJson,
                   ),
                 )
@@ -417,7 +416,7 @@ class FirestoreDataProvider {
           return query.docs
               .map(
                 (doc) => ApiResult.fromResponse(
-                  _toMap(doc.data(), doc.id),
+                  ApiResult.toMap(doc.data(), doc.id),
                   fromJson,
                 ),
               )
@@ -450,7 +449,7 @@ class FirestoreDataProvider {
     try {
       return reference.snapshots().map((doc) {
         return ApiResult.fromResponse(
-          _toMap(doc.data(), doc.id),
+          ApiResult.toMap(doc.data(), doc.id),
           fromJson,
         );
       });
@@ -488,7 +487,7 @@ class FirestoreDataProvider {
       return results.docs
           .map(
             (doc) =>
-                ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson),
+                ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
     } on FirestoreFailure {
@@ -523,7 +522,7 @@ class FirestoreDataProvider {
           return query.docs
               .map(
                 (doc) => ApiResult.fromResponse(
-                  _toMap(doc.data(), doc.id),
+                  ApiResult.toMap(doc.data(), doc.id),
                   fromJson,
                 ),
               )
@@ -564,7 +563,7 @@ class FirestoreDataProvider {
       return results.docs
           .map(
             (doc) =>
-                ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson),
+                ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
     } on FirestoreFailure {
@@ -605,7 +604,7 @@ class FirestoreDataProvider {
       return results.docs
           .map(
             (doc) =>
-                ApiResult.fromResponse(_toMap(doc.data(), doc.id), fromJson),
+                ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
     } on FirestoreFailure {
@@ -680,7 +679,7 @@ class FirestoreDataProvider {
 
     try {
       final newDoc = await reference.add(data);
-      return ApiResult.fromResponse(_toMap(data, newDoc.id), fromJson);
+      return ApiResult.fromResponse(ApiResult.toMap(data, newDoc.id), fromJson);
     } on FirebaseException catch (err) {
       throw FirestoreFailure.fromCode(
         err.code,
