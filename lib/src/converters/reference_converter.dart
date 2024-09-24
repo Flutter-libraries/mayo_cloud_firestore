@@ -7,11 +7,15 @@ class FirebaseReference {
   /// Constructor
   FirebaseReference(this.id, this.path);
 
+  ///
   final String id;
+
+  ///
   final String path;
 
+  /// Convert string --> ref
   DocumentReference? toDocumentReference() =>
-      FirebaseFirestore.instance.doc('${path}/${id}');
+      FirebaseFirestore.instance.doc('$path/$id');
 }
 
 /// Convert ref --> string
@@ -23,7 +27,7 @@ class ReferenceConverter
   @override
   FirebaseReference? fromJson(DocumentReference? reference) {
     return reference != null
-        ? FirebaseReference(reference.id, reference.path)
+        ? FirebaseReference(reference.id, reference.path.split('/').first)
         : null;
   }
 
@@ -39,13 +43,16 @@ extension GetData<T> on FirebaseReference {
   Future<T> get<T>(
     T Function(Map<String, dynamic>) fromJson,
   ) async {
-    final results = await FirebaseFirestore.instance.doc(path).get();
+    final results = await FirebaseFirestore.instance.doc('$path/$id').get();
 
     return ApiResult.fromResponse(
-        ApiResult.toMap(results.data(), id), fromJson);
+      ApiResult.toMap(results.data(), id),
+      fromJson,
+    );
   }
 }
 
+///
 class ReferencesConverter
     implements JsonConverter<List<FirebaseReference>?, List<dynamic>?> {
   /// Constructor
@@ -58,9 +65,12 @@ class ReferencesConverter
 
   @override
   List<DocumentReference>? toJson(
-          List<FirebaseReference>? references) =>
+    List<FirebaseReference>? references,
+  ) =>
       references
-          ?.map((e) => FirebaseFirestore.instance.doc('${e.path}/${e.id}')
-              as DocumentReference)
+          ?.map(
+            (e) => FirebaseFirestore.instance.doc('${e.path}/${e.id}')
+                as DocumentReference,
+          )
           .toList();
 }
