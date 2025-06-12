@@ -124,6 +124,17 @@ class OrderByItem {
   final bool descending;
 }
 
+/// Resultado de una consulta paginada.
+class PaginatedResult<T> {
+  PaginatedResult({
+    required this.results,
+    required this.lastDocumentId,
+  });
+
+  final List<T> results;
+  final String? lastDocumentId;
+}
+
 /// {@template storage_failure}
 /// Thrown if during the firestore operations a failure occurs.
 /// {@endtemplate}
@@ -272,8 +283,6 @@ class FirestoreDataProvider {
   /// Firestore instance
   final FirebaseFirestore instance;
 
-
-
   Query<Map<String, dynamic>> _applyFilters(
     CollectionReference<Map<String, dynamic>> reference,
     List<WhereItem> whereItems,
@@ -349,7 +358,8 @@ class FirestoreDataProvider {
         throw FirestoreFailure.documentNotFound(reference.path);
       }
 
-      return ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson);
+      return ApiResult.fromResponse(
+          ApiResult.toMap(doc.data(), doc.id), fromJson);
     } on FirestoreFailure {
       rethrow;
     } on FirebaseException catch (err) {
@@ -486,12 +496,72 @@ class FirestoreDataProvider {
 
       return results.docs
           .map(
-            (doc) =>
-                ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson),
+            (doc) => ApiResult.fromResponse(
+                ApiResult.toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
     } on FirestoreFailure {
       rethrow;
+    } on FirebaseException catch (err) {
+      throw FirestoreFailure.fromCode(
+        err.code,
+        path: reference.path,
+        stackTrace: err.stackTrace.toString(),
+      );
+    } catch (_) {
+      throw const FirestoreFailure();
+    }
+  }
+
+  /// Consulta paginada con filtros y orden.
+  Future<PaginatedResult<T>> fetchPaginated<T>(
+    String path,
+    T Function(Map<String, dynamic>) fromJson, {
+    required int pageSize,
+    String? startAfterId,
+    List<WhereItem> whereItems = const [],
+    List<OrderByItem> orderByItems = const [],
+  }) async {
+    final reference = instance.collection(path);
+
+    Query<Map<String, dynamic>> query = reference;
+
+    // Aplica filtros
+    if (whereItems.isNotEmpty) {
+      query = _applyFilters(reference, whereItems);
+    }
+
+    // Aplica orden
+    if (orderByItems.isNotEmpty) {
+      query = _applyOrderBy(query, orderByItems);
+    }
+
+    // Limita la cantidad
+    query = query.limit(pageSize);
+
+    // Aplica paginación
+    if (startAfterId != null) {
+      final startDoc = await reference.doc(startAfterId).get();
+      if (startDoc.exists) {
+        query = query.startAfterDocument(startDoc);
+      }
+    }
+
+    try {
+      final snapshot = await query.get();
+      final docs = snapshot.docs;
+
+      final results = docs
+          .map((doc) => ApiResult.fromResponse(
+              ApiResult.toMap(doc.data(), doc.id), fromJson))
+          .toList();
+
+      final lastDocId = docs.isNotEmpty ? docs.last.id : null;
+
+      return PaginatedResult<T>(
+        results: results,
+        lastDocumentId: lastDocId,
+      );
     } on FirebaseException catch (err) {
       throw FirestoreFailure.fromCode(
         err.code,
@@ -562,8 +632,8 @@ class FirestoreDataProvider {
 
       return results.docs
           .map(
-            (doc) =>
-                ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson),
+            (doc) => ApiResult.fromResponse(
+                ApiResult.toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
     } on FirestoreFailure {
@@ -603,8 +673,8 @@ class FirestoreDataProvider {
 
       return results.docs
           .map(
-            (doc) =>
-                ApiResult.fromResponse(ApiResult.toMap(doc.data(), doc.id), fromJson),
+            (doc) => ApiResult.fromResponse(
+                ApiResult.toMap(doc.data(), doc.id), fromJson),
           )
           .toList();
     } on FirestoreFailure {
